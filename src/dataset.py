@@ -35,7 +35,6 @@ class Dataset:
         c2ws = [self.full_c2ws[i] for i in range(len(self.full_c2ws)) if predicate(i)]
         img_paths = [self.full_img_paths[i] for i in range(len(self.full_img_paths)) if predicate(i)]
         
-
         rays = (
             tf.data.Dataset
                 .from_tensor_slices(c2ws)
