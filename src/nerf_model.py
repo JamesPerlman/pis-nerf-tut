@@ -1,7 +1,6 @@
 import tensorflow as tf
 
 def create_nerf_model(
-    self,
     n_dim_xyz: int, # number of dimensions for positional encoding of ray origins
     n_dim_dir: int, # num dims for positional encoding of ray directions
     batch_size: int,
