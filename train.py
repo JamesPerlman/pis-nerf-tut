@@ -19,3 +19,6 @@ if __name__ == '__main__':
     args = parse_args()
 
     dataset = Dataset(args.dir)
+    print(f"{dataset.test}")
+    print(f"{dataset.val}")
+    print(f"{dataset.train}")
