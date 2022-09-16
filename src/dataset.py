@@ -1,11 +1,10 @@
 import numpy as np
 import tensorflow as tf
+from src.rays import GetRays
 
-from src.camera import Camera
 from pathlib import Path
 from PIL import Image
 from src.utils import read_json
-
 
 class Dataset:
     def __init__(self, data_dir: Path | str):
@@ -26,7 +25,7 @@ class Dataset:
                 .from_tensor_slices(img_paths)
                 .map(
                     lambda path: tf.py_function(load_img, [path], [tf.string]),
-                    num_parallel_calls=tf.data.AUTOTUNE
+                    num_parallel_calls=tf.data.AUTOTUNE,
                 )
         )
 
@@ -34,12 +33,19 @@ class Dataset:
         img_height = json_data["h"]
         focal_len = json_data["fl_x"]
 
-        cams = [Camera(f["transform_matrix"], focal_len, img_width, img_height) for f in json_data["frames"]]
-        rays = [cam.get_rays(2, 6, 100) for cam in cams]
+        c2ws = [f["transform_matrix"] for f in json_data["frames"]]
+        
+        # TODO: set near, far, n_samples in a config file
+        get_rays = GetRays(focal_len, img_width, img_height, 2, 6, 64)
+        
         rays_full = (
             tf.data.Dataset
-                .from_tensor_slices(rays)
+                .from_tensor_slices(c2ws)
+                .map(
+                    get_rays,
+                    num_parallel_calls=tf.data.AUTOTUNE,
+                )
         )
 
-        print(imgs_full)
+        
         print(rays_full)

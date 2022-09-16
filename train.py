@@ -19,5 +19,3 @@ if __name__ == '__main__':
     args = parse_args()
 
     dataset = Dataset(args.dir)
-
-    print(dataset.cameras)
