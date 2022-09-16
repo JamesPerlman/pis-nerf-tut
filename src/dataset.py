@@ -32,23 +32,24 @@ class Dataset:
 
     def make_split(self, predicate):
 
-        img_paths = [self.full_img_paths[i] for i in range(len(self.full_img_paths)) if predicate(i)]
         c2ws = [self.full_c2ws[i] for i in range(len(self.full_c2ws)) if predicate(i)]
+        img_paths = [self.full_img_paths[i] for i in range(len(self.full_img_paths)) if predicate(i)]
         
-        imgs = (
-            tf.data.Dataset
-                .from_tensor_slices(img_paths)
-                .map(
-                    self.load_img,
-                    num_parallel_calls=tf.data.AUTOTUNE,
-                )
-        )
 
         rays = (
             tf.data.Dataset
                 .from_tensor_slices(c2ws)
                 .map(
                     self.get_rays,
+                    num_parallel_calls=tf.data.AUTOTUNE,
+                )
+        )
+
+        imgs = (
+            tf.data.Dataset
+                .from_tensor_slices(img_paths)
+                .map(
+                    self.load_img,
                     num_parallel_calls=tf.data.AUTOTUNE,
                 )
         )
