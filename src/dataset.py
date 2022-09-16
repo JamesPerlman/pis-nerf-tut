@@ -1,14 +1,12 @@
-import numpy as np
 import tensorflow as tf
 from src.image_loader import ImageLoader
 from src.rays import GetRays
 
 from pathlib import Path
-from PIL import Image
 from src.utils import read_json
 
 class Dataset:
-    def __init__(self, data_dir: Path | str):
+    def __init__(self, data_dir: Path | str, near: int, far: int, n_coarse_samples: int):
         self.data_dir = Path(data_dir)
         self.transforms_path = self.data_dir / "transforms.json"
         
@@ -17,12 +15,12 @@ class Dataset:
         self.full_img_paths = [str(self.data_dir / Path(f["file_path"])) for f in json_data["frames"]]
         self.full_c2ws = [f["transform_matrix"] for f in json_data["frames"]]
         
-        img_width = json_data["w"]
-        img_height = json_data["h"]
+        self.img_width = json_data["w"]
+        self.img_height = json_data["h"]
         focal_len = json_data["fl_x"]
 
-        self.get_rays = GetRays(focal_len, img_width, img_height, 2, 6, 64)
-        self.load_img = ImageLoader(img_width, img_height)
+        self.get_rays = GetRays(focal_len, self.img_width, self.img_height, near, far, n_coarse_samples)
+        self.load_img = ImageLoader(self.img_width, self.img_height)
         
         # split dataset into test, train, and validation
         # 10/10/80 split
